@@ -1,0 +1,6 @@
+{
+  "name": "Sunshine Minecraft Server",
+  "description": "Website elegan untuk memperkenalkan server Minecraft Sunshine dengan rincian fitur, galeri dunia, informasi gameplay, dan cara bergabung melalui WhatsApp.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
