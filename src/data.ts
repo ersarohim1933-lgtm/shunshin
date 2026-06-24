@@ -3,7 +3,7 @@ import { Feature, JoinStep, ServerRule, ServerInfo, GalleryItem } from './types'
 export const WHATSAPP_GROUP_LINK = "https://chat.whatsapp.com/D9cijRhTVNm3pBupyVp5Hk?s=cl&p=a&mlu=1&amv=3";
 
 export const SERVER_INFO: ServerInfo = {
-  ip: "shunshine.qzz.io",
+  ip: "play.shunshine.qzz.io",
   portJava: 19136,
   portBedrock: 19136,
   version: "1.20.x - 1.21.x (Versi Terbaru)",
@@ -67,7 +67,7 @@ export const JOIN_STEPS: JoinStep[] = [
   {
     step: 2,
     title: "Salin IP & Port Server",
-    description: "Salin IP server: shunshine.qzz.io dengan Port: 19136. Port ini sama untuk pemain Java (PC) maupun Bedrock / Pocket Edition (HP)."
+    description: "Salin IP server: play.shunshine.qzz.io dengan Port: 19136. Port ini sama untuk pemain Java (PC) maupun Bedrock / Pocket Edition (HP)."
   },
   {
     step: 3,
