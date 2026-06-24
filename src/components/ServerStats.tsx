@@ -1,12 +1,50 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SERVER_INFO } from '../data';
-import { Server, Cpu, Wifi, Activity, Sparkles } from 'lucide-react';
+import { Server, Cpu, Wifi, Activity, Sparkles, Users } from 'lucide-react';
 import { motion } from 'motion/react';
+
+interface ServerStatus {
+  online: boolean;
+  currentPlayers: number;
+  maxPlayers: number;
+  onlinePlayers: string[];
+  error?: string;
+}
 
 export default function ServerStats() {
   const [pingRegion, setPingRegion] = useState<string>('default');
   const [pingResult, setPingResult] = useState<number | null>(null);
   const [isPinging, setIsPinging] = useState<boolean>(false);
+
+  // Live status states
+  const [status, setStatus] = useState<ServerStatus | null>(null);
+  const [isLoadingStatus, setIsLoadingStatus] = useState<boolean>(true);
+
+  // Fetch server status from backend API
+  const fetchServerStatus = async () => {
+    try {
+      const res = await fetch('/api/server-status');
+      const data = await res.json();
+      setStatus(data);
+    } catch (e) {
+      setStatus({
+        online: false,
+        currentPlayers: 0,
+        maxPlayers: 20,
+        onlinePlayers: [],
+        error: 'Offline'
+      });
+    } finally {
+      setIsLoadingStatus(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchServerStatus();
+    // Refresh stats every 30 seconds
+    const interval = setInterval(fetchServerStatus, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Ping test trigger simulator
   const handlePingTest = (region: string) => {
@@ -42,26 +80,41 @@ export default function ServerStats() {
           >
             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-500/5 to-transparent rounded-bl-full" />
             <div className="flex items-center gap-4">
-              <div className="p-3.5 bg-green-500/10 rounded-xl text-green-400">
+              <div className={`p-3.5 rounded-xl ${status?.online ? 'bg-green-500/10 text-green-400' : isLoadingStatus ? 'bg-amber-500/10 text-amber-400' : 'bg-red-500/10 text-red-400'}`}>
                 <Server className="w-6 h-6" />
               </div>
               <div>
                 <span className="text-xs font-mono tracking-widest text-neutral-400 uppercase">Status Server</span>
                 <div className="flex items-baseline gap-1.5 mt-0.5">
-                  <span className="text-3xl font-display font-bold text-green-400 tracking-tight">ONLINE</span>
+                  {isLoadingStatus ? (
+                    <span className="text-2xl font-display font-bold text-amber-400 tracking-tight animate-pulse">MEMUAT...</span>
+                  ) : status?.online ? (
+                    <span className="text-3xl font-display font-bold text-green-400 tracking-tight">ONLINE</span>
+                  ) : (
+                    <span className="text-3xl font-display font-bold text-red-400 tracking-tight">OFFLINE</span>
+                  )}
                 </div>
               </div>
             </div>
             <div className="mt-4 flex items-center gap-1.5 text-xs text-neutral-400">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-              </span>
-              <span className="font-mono text-neutral-300">Siap dimainkan kapan saja</span>
+              {status?.online ? (
+                <>
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                  </span>
+                  <span className="font-mono text-neutral-300">Siap dimainkan kapan saja</span>
+                </>
+              ) : (
+                <>
+                  <span className="h-2 w-2 rounded-full bg-red-500" />
+                  <span className="font-mono text-neutral-400">Sedang pemeliharaan / offline</span>
+                </>
+              )}
             </div>
           </motion.div>
 
-          {/* STAT 2: HARDWARE STATUS */}
+          {/* STAT 2: PLAYERS ONLINE COUNT */}
           <motion.div 
             whileHover={{ y: -5 }}
             className="bg-neutral-950/70 border border-neutral-800/80 rounded-2xl p-6 shadow-md relative overflow-hidden"
@@ -69,19 +122,25 @@ export default function ServerStats() {
             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-amber-500/5 to-transparent rounded-bl-full" />
             <div className="flex items-center gap-4">
               <div className="p-3.5 bg-amber-500/10 rounded-xl text-amber-400">
-                <Cpu className="w-6 h-6" />
+                <Users className="w-6 h-6" />
               </div>
               <div>
-                <span className="text-xs font-mono tracking-widest text-neutral-400 uppercase">Performa Server</span>
+                <span className="text-xs font-mono tracking-widest text-neutral-400 uppercase">Pemain Aktif</span>
                 <div className="flex items-baseline gap-1.5 mt-0.5">
-                  <span className="text-2xl font-display font-bold text-white">20.0 TPS</span>
-                  <span className="text-xs text-green-400 font-mono font-medium">Sempurna</span>
+                  <span className="text-3xl font-display font-bold text-white">
+                    {isLoadingStatus ? "-" : status?.currentPlayers ?? 0}
+                  </span>
+                  <span className="text-sm text-neutral-500">
+                    / {isLoadingStatus ? "-" : status?.maxPlayers ?? 20} Warga
+                  </span>
                 </div>
               </div>
             </div>
-            <div className="flex gap-2 mt-4 text-[11px] font-mono text-neutral-500">
-              <span className="bg-neutral-900 px-2 py-0.5 rounded border border-neutral-800 text-neutral-400">RAM: 16GB Dedicated</span>
-              <span className="bg-neutral-900 px-2 py-0.5 rounded border border-neutral-800 text-neutral-400">Uptime: 99.9%</span>
+            <div className="mt-4 flex items-center justify-between text-xs text-neutral-400 font-mono">
+              <span>Maksimal Kapasitas: {status?.maxPlayers ?? 20}</span>
+              {status?.onlinePlayers && status.onlinePlayers.length > 0 && (
+                <span className="text-amber-400 text-[10px] animate-pulse">Warga aktif bermain!</span>
+              )}
             </div>
           </motion.div>
 
@@ -93,7 +152,7 @@ export default function ServerStats() {
             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-amber-500/5 to-transparent rounded-bl-full" />
             <div className="flex items-center gap-4">
               <div className="p-3.5 bg-amber-500/10 rounded-xl text-amber-400">
-                <Server className="w-6 h-6" />
+                <Cpu className="w-6 h-6" />
               </div>
               <div>
                 <span className="text-xs font-mono tracking-widest text-neutral-400 uppercase">Tipe Server</span>
