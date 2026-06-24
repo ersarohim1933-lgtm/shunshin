@@ -93,6 +93,16 @@ export default function Header() {
             >
               Aturan Server
             </button>
+
+            <a 
+              href="https://minecraft-mp.com/server/359813/vote/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-semibold text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1"
+            >
+              Vote Server
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
           </nav>
 
           {/* Desktop CTA Action Buttons */}
@@ -153,6 +163,16 @@ export default function Header() {
               >
                 Aturan Server
               </button>
+
+              <a
+                href="https://minecraft-mp.com/server/359813/vote/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full text-left py-2.5 px-3 rounded-lg text-base font-semibold text-amber-400 hover:bg-neutral-900 hover:text-amber-300 transition-all cursor-pointer flex items-center justify-between"
+              >
+                <span>Vote Server</span>
+                <ExternalLink className="w-4 h-4" />
+              </a>
               
               <div className="pt-4 border-t border-neutral-900">
                 <a
