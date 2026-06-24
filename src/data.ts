@@ -31,7 +31,7 @@ export const FEATURES: Feature[] = {
       {
         id: "feat-3",
         title: "Ekonomi Seimbang (Player Shops)",
-        description: "Berdaganglah secara bebas dengan pemain lain! Dirikan tokomu sendiri di area pasar, pasang harga terbaik, dan jadilah saudagar paling kaya di Sunshine.",
+        description: "Berdaganglah secara bebas dengan pemain lain! Dirikan tokomu sendiri di area pasar, pasang harga terbaik, dan jadilah saudagar paling kaya di Shunshine.",
         iconName: "Coins"
       },
       {
@@ -43,7 +43,7 @@ export const FEATURES: Feature[] = {
       {
         id: "feat-5",
         title: "Kebebasan Survival (Bebas Griefing)",
-        description: "Ekspresikan dirimu sepenuhnya! Di server Sunshine, tidak ada aturan proteksi lahan yang kaku. Semua pemain bebas melakukan griefing, raiding, dan menjarah untuk bertahan hidup.",
+        description: "Ekspresikan dirimu sepenuhnya! Di server Shunshine, tidak ada aturan proteksi lahan yang kaku. Semua pemain bebas melakukan griefing, raiding, dan menjarah untuk bertahan hidup.",
         iconName: "ShieldCheck"
       },
       {
@@ -60,7 +60,7 @@ export const JOIN_STEPS: JoinStep[] = [
   {
     step: 1,
     title: "Gabung Grup WhatsApp",
-    description: "Langkah terbaik untuk memulai! Masuk ke komunitas utama Sunshine terlebih dahulu karena segala koordinasi, diskusi faksi, trading barang, dan pembaruan penting diumumkan di grup ini.",
+    description: "Langkah terbaik untuk memulai! Masuk ke komunitas utama Shunshine terlebih dahulu karena segala koordinasi, diskusi faksi, trading barang, dan pembaruan penting diumumkan di grup ini.",
     ctaText: "Gabung Grup WA Sekarang",
     ctaLink: WHATSAPP_GROUP_LINK
   },

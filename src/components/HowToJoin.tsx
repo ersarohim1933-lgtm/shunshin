@@ -32,7 +32,7 @@ export default function HowToJoin() {
             TUTORIAL BERGABUNG
           </span>
           <h2 className="font-display font-bold text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight mt-2 mb-4">
-            Cara Bergabung ke Sunshine Server
+            Cara Bergabung ke Shunshine Server
           </h2>
           <div className="h-1 w-20 bg-gradient-to-r from-amber-500 to-amber-300 mx-auto rounded-full mb-6" />
           <p className="text-neutral-400 font-sans font-light text-base sm:text-lg">
@@ -53,7 +53,7 @@ export default function HowToJoin() {
             </h3>
             
             <p className="text-sm text-neutral-300 font-sans leading-relaxed mb-6 font-light">
-              Grup WhatsApp Sunshine adalah pusat berkumpulnya para petualang. Masuk ke grup WhatsApp berfungsi sebagai:
+              Grup WhatsApp Shunshine adalah pusat berkumpulnya para petualang. Masuk ke grup WhatsApp berfungsi sebagai:
             </p>
 
             <ul className="space-y-4 mb-8">
@@ -90,7 +90,7 @@ export default function HowToJoin() {
                   LINK GRUP WHATSAPP RESMI
                 </h4>
                 <p className="text-xs text-neutral-400 font-sans font-light mt-1">
-                  Bergabunglah melalui tautan resmi WhatsApp untuk berdiskusi, koordinasi faksi, dan mendapatkan kabar terbaru langsung dari Admin Sunshine.
+                  Bergabunglah melalui tautan resmi WhatsApp untuk berdiskusi, koordinasi faksi, dan mendapatkan kabar terbaru langsung dari Admin Shunshine.
                 </p>
                 <a
                   href={WHATSAPP_GROUP_LINK}

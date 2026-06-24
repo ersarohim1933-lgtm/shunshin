@@ -26,13 +26,13 @@ export default function Footer() {
               >
                 <img 
                   src="/src/assets/images/sunshine_logo_1782281585072.jpg" 
-                  alt="Sunshine Logo" 
+                  alt="Shunshine Logo" 
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
                 />
               </div>
               <span className="font-display font-bold text-lg tracking-wider text-white">
-                SUNSHINE SERVER
+                SHUNSHINE SERVER
               </span>
             </div>
             <p className="text-xs text-neutral-400 font-sans font-light leading-relaxed max-w-sm">
@@ -70,7 +70,7 @@ export default function Footer() {
         {/* Bottom Credits section */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-neutral-500">
           <div className="flex items-center gap-1.5">
-            <span>© {currentYear} Sunshine Minecraft Server. All Rights Reserved.</span>
+            <span>© {currentYear} Shunshine Minecraft Server. All Rights Reserved.</span>
           </div>
           
           <div className="flex items-center gap-1.5">

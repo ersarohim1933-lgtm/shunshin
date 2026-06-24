@@ -41,7 +41,7 @@ export default function Hero() {
       <div className="absolute inset-0 z-0">
         <img
           src="/src/assets/images/sunshine_hero_1782281566632.jpg"
-          alt="Sunshine Minecraft Landscape"
+          alt="Shunshine Minecraft Landscape"
           className="w-full h-full object-cover scale-102 filter brightness-[0.35]"
           referrerPolicy="no-referrer"
         />
@@ -68,7 +68,7 @@ export default function Hero() {
             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
           </span>
           <span className="text-xs font-mono tracking-wider font-semibold text-amber-300 uppercase">
-            SUNSHINE SERVER ONLINE • VERSION {SERVER_INFO.version}
+            SHUNSHINE SERVER ONLINE • VERSION {SERVER_INFO.version}
           </span>
         </motion.div>
 
@@ -92,7 +92,7 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-base sm:text-xl text-neutral-300 max-w-2xl mx-auto font-sans font-light leading-relaxed"
           >
-            Selamat datang di <strong className="text-amber-400 font-semibold">Sunshine Server</strong>. Temukan dunia survival terbaik, komunitas ramah yang diintegrasikan secara eksklusif dengan WhatsApp, dan sistem ekonomi berkeadilan.
+            Selamat datang di <strong className="text-amber-400 font-semibold">Shunshine Server</strong>. Temukan dunia survival terbaik, komunitas ramah yang diintegrasikan secara eksklusif dengan WhatsApp, dan sistem ekonomi berkeadilan.
           </motion.p>
         </div>
 
@@ -214,7 +214,7 @@ export default function Hero() {
           transition={{ duration: 0.5, delay: 0.6 }}
           className="text-xs text-neutral-500 mt-6 font-mono max-w-lg mx-auto"
         >
-          *Catatan: Sangat disarankan bergabung ke Grup WhatsApp untuk koordinasi faksi, event seru, dan bersosialisasi dengan komunitas Sunshine.
+          *Catatan: Sangat disarankan bergabung ke Grup WhatsApp untuk koordinasi faksi, event seru, dan bersosialisasi dengan komunitas Shunshine.
         </motion.p>
 
         {/* Animated Chevron Down Indicator */}

@@ -35,10 +35,10 @@ export default function Features() {
         {/* Section Heading */}
         <div className="text-center max-w-3xl mx-auto mb-20">
           <span className="text-xs font-mono tracking-widest text-amber-500 uppercase font-semibold">
-            KEUNGGULAN SUNSHINE
+            KEUNGGULAN SHUNSHINE
           </span>
           <h2 className="font-display font-bold text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight mt-2 mb-4">
-            Mengapa Kamu Harus Bermain di Sunshine?
+            Mengapa Kamu Harus Bermain di Shunshine?
           </h2>
           <div className="h-1 w-20 bg-gradient-to-r from-amber-500 to-amber-300 mx-auto rounded-full mb-6" />
           <p className="text-neutral-400 font-sans font-light text-base sm:text-lg">

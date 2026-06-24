@@ -24,11 +24,11 @@ export default function Rules() {
             KONSTITUSI SERVER
           </span>
           <h2 className="font-display font-bold text-3xl sm:text-4xl text-white tracking-tight mt-2 mb-4">
-            Aturan Bermain di Sunshine
+            Aturan Bermain di Shunshine
           </h2>
           <div className="h-1 w-20 bg-gradient-to-r from-amber-500 to-amber-300 mx-auto rounded-full mb-6" />
           <p className="text-neutral-400 font-sans font-light text-sm sm:text-base max-w-2xl mx-auto">
-            Demi menjaga kenyamanan dan sportivitas seluruh warga Sunshine, setiap pemain berkewajiban untuk mematuhi dan menegakkan peraturan utama di bawah ini.
+            Demi menjaga kenyamanan dan sportivitas seluruh warga Shunshine, setiap pemain berkewajiban untuk mematuhi dan menegakkan peraturan utama di bawah ini.
           </p>
         </div>
 
@@ -96,7 +96,7 @@ export default function Rules() {
               SANKSI PELANGGARAN
             </h4>
             <p className="text-xs text-neutral-400 font-sans font-light leading-relaxed mt-1">
-              Admin Sunshine berhak memberikan sanksi berupa teguran keras, pembersihan inventaris (inventory wipe), penyitaan lahan klaim, hingga pemblokiran permanen (Banned) dari server dan grup WhatsApp terhadap pemain yang terbukti melanggar aturan di atas demi kelangsungan keharmonisan komunitas.
+              Admin Shunshine berhak memberikan sanksi berupa teguran keras, pembersihan inventaris (inventory wipe), penyitaan lahan klaim, hingga pemblokiran permanen (Banned) dari server dan grup WhatsApp terhadap pemain yang terbukti melanggar aturan di atas demi kelangsungan keharmonisan komunitas.
             </p>
           </div>
         </div>

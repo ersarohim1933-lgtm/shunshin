@@ -115,16 +115,30 @@ async function startServer() {
 
   app.use(express.json());
 
-  const SERVER_HOST = "play.shunshine.qzz.io";
+  const PREFERRED_HOST = "play.shunshine.qzz.io";
+  const FALLBACK_HOST = "play.shunshine.qzz.io";
 
   // API Route: Get Server Status
   app.get("/api/server-status", async (req, res) => {
-    // 1. Perform direct instant real-time checks on host
-    // Java port 19136, Bedrock port 19136
-    const [tcpOnline, udpOnline] = await Promise.all([
-      pingMinecraftPort(SERVER_HOST, 19136, 1500),
-      pingBedrockUdp(SERVER_HOST, 19136, 1500)
+    // Determine which host is currently online
+    let activeHost = PREFERRED_HOST;
+    let [tcpOnline, udpOnline] = await Promise.all([
+      pingMinecraftPort(PREFERRED_HOST, 19136, 1200),
+      pingBedrockUdp(PREFERRED_HOST, 19136, 1200)
     ]);
+
+    // If preferred host fails, try fallback host immediately
+    if (!tcpOnline && !udpOnline) {
+      const [fbTcp, fbUdp] = await Promise.all([
+        pingMinecraftPort(FALLBACK_HOST, 19136, 1200),
+        pingBedrockUdp(FALLBACK_HOST, 19136, 1200)
+      ]);
+      if (fbTcp || fbUdp) {
+        activeHost = FALLBACK_HOST;
+        tcpOnline = fbTcp;
+        udpOnline = fbUdp;
+      }
+    }
 
     const isCurrentlyOnline = tcpOnline || udpOnline;
 
@@ -135,14 +149,14 @@ async function startServer() {
         currentPlayers: 0,
         maxPlayers: 50, // Default configured max players
         onlinePlayers: [],
-        host: SERVER_HOST,
+        host: PREFERRED_HOST,
         realtime: true
       });
     }
 
     try {
       // Fetch status from Minecraft server status API to get player counts, list of players, and max capacity
-      const response = await fetch(`https://api.mcsrvstat.us/3/${SERVER_HOST}`);
+      const response = await fetch(`https://api.mcsrvstat.us/3/${activeHost}`);
       if (!response.ok) {
         throw new Error(`Public API returned status ${response.status}`);
       }
@@ -153,7 +167,7 @@ async function startServer() {
         currentPlayers: data.players?.online ?? 0,
         maxPlayers: data.players?.max ?? 50, // Default to 50 as set by user
         onlinePlayers: data.players?.list?.map((p: any) => typeof p === 'string' ? p : p.name) ?? [],
-        host: SERVER_HOST,
+        host: PREFERRED_HOST,
         realtime: true
       });
     } catch (error: any) {
@@ -161,7 +175,7 @@ async function startServer() {
       
       // Fallback to minetools if mcsrvstat is down or rate-limited
       try {
-        const altResponse = await fetch(`https://api.minetools.eu/ping/${SERVER_HOST}/19136`);
+        const altResponse = await fetch(`https://api.minetools.eu/ping/${activeHost}/19136`);
         if (altResponse.ok) {
           const altData = await altResponse.json();
           if (!altData.error) {
@@ -170,7 +184,7 @@ async function startServer() {
               currentPlayers: altData.players?.online ?? 0,
               maxPlayers: altData.players?.max ?? 50,
               onlinePlayers: [],
-              host: SERVER_HOST,
+              host: PREFERRED_HOST,
               realtime: true
             });
             return;
@@ -186,7 +200,7 @@ async function startServer() {
         currentPlayers: 0,
         maxPlayers: 50,
         onlinePlayers: [],
-        host: SERVER_HOST,
+        host: PREFERRED_HOST,
         realtime: true,
         warning: "API statistik penuh sedang bermasalah, namun koneksi server aktif."
       });

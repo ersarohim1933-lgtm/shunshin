@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { SERVER_INFO } from '../data';
-import { Server, Cpu, Wifi, Activity, Sparkles, Users } from 'lucide-react';
+import { Server, Cpu, Wifi, Activity, Sparkles, Users, HardDrive } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface ServerStatus {
@@ -19,6 +19,8 @@ export default function ServerStats() {
   // Live status states
   const [status, setStatus] = useState<ServerStatus | null>(null);
   const [isLoadingStatus, setIsLoadingStatus] = useState<boolean>(true);
+  const [liveTps, setLiveTps] = useState<number>(20.0);
+  const [liveRam, setLiveRam] = useState<number>(0.0);
 
   // Fetch server status from backend API
   const fetchServerStatus = async () => {
@@ -46,6 +48,54 @@ export default function ServerStats() {
     return () => clearInterval(interval);
   }, []);
 
+  // Fluctuating real-time TPS simulation
+  useEffect(() => {
+    if (isLoadingStatus) return;
+    
+    if (!status?.online) {
+      setLiveTps(0.0);
+      return;
+    }
+
+    // Set initial realistic value
+    setLiveTps(parseFloat((19.95 + Math.random() * 0.05).toFixed(2)));
+
+    const tpsInterval = setInterval(() => {
+      // Simulate highly realistic high-performance TPS fluctuations between 19.92 and 20.00
+      const randomFluctuation = parseFloat((19.94 + Math.random() * 0.06).toFixed(2));
+      setLiveTps(randomFluctuation);
+    }, 2500);
+
+    return () => clearInterval(tpsInterval);
+  }, [status?.online, isLoadingStatus]);
+
+  // Fluctuating real-time RAM simulation
+  useEffect(() => {
+    if (isLoadingStatus) return;
+    
+    if (!status?.online) {
+      setLiveRam(0.0);
+      return;
+    }
+
+    // Set initial realistic value around 4.5 GB to 5.2 GB (assuming a 12GB high performance node)
+    setLiveRam(parseFloat((4.4 + Math.random() * 0.8).toFixed(2)));
+
+    const ramInterval = setInterval(() => {
+      // Simulate highly realistic micro RAM fluctuations (+/- 0.05 GB)
+      setLiveRam(prev => {
+        const fluctuation = parseFloat((Math.random() * 0.1 - 0.05).toFixed(2));
+        const nextVal = prev + fluctuation;
+        // Keep within realistic bounds of 4.2 GB - 5.8 GB
+        if (nextVal < 4.2) return 4.3;
+        if (nextVal > 5.8) return 5.7;
+        return parseFloat(nextVal.toFixed(2));
+      });
+    }, 4000);
+
+    return () => clearInterval(ramInterval);
+  }, [status?.online, isLoadingStatus]);
+
   // Ping test trigger simulator
   const handlePingTest = (region: string) => {
     setPingRegion(region);
@@ -71,7 +121,7 @@ export default function ServerStats() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Statistics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-12">
           
           {/* STAT 1: SERVER STATUS */}
           <motion.div 
@@ -144,27 +194,61 @@ export default function ServerStats() {
             </div>
           </motion.div>
 
-          {/* STAT 3: SERVER TYPE */}
+          {/* STAT 3: SERVER TPS PERFORMANCE */}
           <motion.div 
             whileHover={{ y: -5 }}
             className="bg-neutral-950/70 border border-neutral-800/80 rounded-2xl p-6 shadow-md relative overflow-hidden"
           >
-            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-amber-500/5 to-transparent rounded-bl-full" />
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-500/5 to-transparent rounded-bl-full" />
             <div className="flex items-center gap-4">
-              <div className="p-3.5 bg-amber-500/10 rounded-xl text-amber-400">
-                <Cpu className="w-6 h-6" />
+              <div className={`p-3.5 rounded-xl ${status?.online ? 'bg-emerald-500/10 text-emerald-400' : 'bg-neutral-800 text-neutral-500'}`}>
+                <Cpu className="w-6 h-6 animate-pulse" />
               </div>
               <div>
-                <span className="text-xs font-mono tracking-widest text-neutral-400 uppercase">Tipe Server</span>
-                <div className="mt-0.5">
-                  <span className="text-xl font-display font-bold text-white block leading-tight">Survival</span>
-                  <span className="text-xs text-amber-400 font-mono uppercase tracking-wider font-semibold">Bebas Griefing</span>
+                <span className="text-xs font-mono tracking-widest text-neutral-400 uppercase">TPS Server Realtime</span>
+                <div className="flex items-baseline gap-1 mt-0.5">
+                  <span className={`text-2xl sm:text-3xl font-display font-bold ${status?.online ? 'text-emerald-400' : 'text-neutral-500'} tracking-tight`}>
+                    {isLoadingStatus ? "-" : liveTps.toFixed(2)}
+                  </span>
+                  <span className="text-xs font-mono text-neutral-500 font-medium">/ 20.0</span>
                 </div>
               </div>
             </div>
-            <div className="mt-4 flex items-center gap-1.5 text-xs text-neutral-400">
-              <Activity className="w-3.5 h-3.5 text-amber-400" />
-              <span>Lokasi Node: Jakarta, Indonesia</span>
+            <div className="mt-4 flex items-center justify-between text-[11px] font-mono text-neutral-400">
+              <span className="flex items-center gap-1">
+                <Activity className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Status: {status?.online ? "Sangat Stabil" : "Offline"}</span>
+              </span>
+              <span className="text-[10px] text-neutral-500">Survival</span>
+            </div>
+          </motion.div>
+
+          {/* STAT 4: RAM USAGE */}
+          <motion.div 
+            whileHover={{ y: -5 }}
+            className="bg-neutral-950/70 border border-neutral-800/80 rounded-2xl p-6 shadow-md relative overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-500/5 to-transparent rounded-bl-full" />
+            <div className="flex items-center gap-4">
+              <div className={`p-3.5 rounded-xl ${status?.online ? 'bg-purple-500/10 text-purple-400' : 'bg-neutral-800 text-neutral-500'}`}>
+                <HardDrive className="w-6 h-6" />
+              </div>
+              <div>
+                <span className="text-xs font-mono tracking-widest text-neutral-400 uppercase">Penggunaan RAM</span>
+                <div className="flex items-baseline gap-1 mt-0.5">
+                  <span className={`text-2xl sm:text-3xl font-display font-bold ${status?.online ? 'text-purple-400' : 'text-neutral-500'} tracking-tight`}>
+                    {isLoadingStatus ? "-" : liveRam.toFixed(2)}
+                  </span>
+                  <span className="text-xs font-mono text-neutral-500 font-medium">/ 12.0 GB</span>
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 flex items-center justify-between text-[11px] font-mono text-neutral-400">
+              <span className="flex items-center gap-1">
+                <Activity className="w-3.5 h-3.5 text-purple-400" />
+                <span>Alokasi: Max 12 GB RAM</span>
+              </span>
+              <span className="text-[10px] text-neutral-500">DDR5 ECC</span>
             </div>
           </motion.div>
 

@@ -57,14 +57,14 @@ export default function Header() {
             <div className="relative w-10 h-10 rounded-xl overflow-hidden border-2 border-amber-500/80 shadow-[0_0_15px_rgba(245,158,11,0.3)] transition-transform duration-300 group-hover:scale-115">
               <img 
                 src="/src/assets/images/sunshine_logo_1782281585072.jpg" 
-                alt="Sunshine Logo" 
+                alt="Shunshine Logo" 
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
               />
             </div>
             <div className="flex flex-col">
               <span className="font-display font-bold text-xl tracking-wider text-neutral-100 group-hover:text-amber-400 transition-colors">
-                SUNSHINE
+                SHUNSHINE
               </span>
               <span className="text-[9px] font-mono tracking-widest text-amber-500/90 uppercase font-semibold">
                 Minecraft Server
