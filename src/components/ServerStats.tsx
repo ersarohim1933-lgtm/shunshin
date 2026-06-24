@@ -22,20 +22,65 @@ export default function ServerStats() {
   const [liveTps, setLiveTps] = useState<number>(20.0);
   const [liveRam, setLiveRam] = useState<number>(0.0);
 
-  // Fetch server status from backend API
+  // Fetch server status from backend API, with fallback directly to public APIs on client side (for Vercel/static deploys)
   const fetchServerStatus = async () => {
     try {
       const res = await fetch('/api/server-status');
+      if (!res.ok) {
+        throw new Error(`Backend API returned status ${res.status}`);
+      }
       const data = await res.json();
+      if (typeof data.online !== 'boolean') {
+        throw new Error('Invalid json from backend');
+      }
       setStatus(data);
     } catch (e) {
-      setStatus({
-        online: false,
-        currentPlayers: 0,
-        maxPlayers: 20,
-        onlinePlayers: [],
-        error: 'Offline'
-      });
+      console.warn('Backend API tidak tersedia atau gagal (kemungkinan dideploy di Vercel/Hosting Statis). Mencoba fetch client-side langsung...', e);
+      
+      // Fallback 1: Fetch directly from public mcsrvstat API on the browser
+      try {
+        const publicRes = await fetch(`https://api.mcsrvstat.us/3/${SERVER_INFO.ip}`);
+        if (!publicRes.ok) {
+          throw new Error(`Public mcsrvstat returned ${publicRes.status}`);
+        }
+        const data = await publicRes.json();
+        setStatus({
+          online: data.online ?? false,
+          currentPlayers: data.players?.online ?? 0,
+          maxPlayers: data.players?.max ?? 20,
+          onlinePlayers: data.players?.list?.map((p: any) => typeof p === 'string' ? p : p.name) ?? [],
+        });
+      } catch (publicError) {
+        console.error('Fetch mcsrvstat gagal:', publicError);
+        
+        // Fallback 2: Fetch from minetools
+        try {
+          const altRes = await fetch(`https://api.minetools.eu/ping/${SERVER_INFO.ip}/19136`);
+          if (altRes.ok) {
+            const altData = await altRes.json();
+            if (!altData.error) {
+              setStatus({
+                online: true,
+                currentPlayers: altData.players?.online ?? 0,
+                maxPlayers: altData.players?.max ?? 20,
+                onlinePlayers: [],
+              });
+              return;
+            }
+          }
+        } catch (altError) {
+          console.error('Fetch minetools gagal:', altError);
+        }
+
+        // If all fail, mark as offline
+        setStatus({
+          online: false,
+          currentPlayers: 0,
+          maxPlayers: 20,
+          onlinePlayers: [],
+          error: 'Offline'
+        });
+      }
     } finally {
       setIsLoadingStatus(false);
     }
