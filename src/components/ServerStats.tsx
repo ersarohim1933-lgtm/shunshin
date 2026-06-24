@@ -78,17 +78,17 @@ export default function ServerStats() {
       return;
     }
 
-    // Set initial realistic value around 4.5 GB to 5.2 GB (assuming a 12GB high performance node)
-    setLiveRam(parseFloat((4.4 + Math.random() * 0.8).toFixed(2)));
+    // Set initial realistic value around 1.04 GiB (as shown in panel screenshot)
+    setLiveRam(parseFloat((1.01 + Math.random() * 0.06).toFixed(2)));
 
     const ramInterval = setInterval(() => {
-      // Simulate highly realistic micro RAM fluctuations (+/- 0.05 GB)
+      // Simulate highly realistic micro RAM fluctuations (+/- 0.02 GiB)
       setLiveRam(prev => {
-        const fluctuation = parseFloat((Math.random() * 0.1 - 0.05).toFixed(2));
+        const fluctuation = parseFloat((Math.random() * 0.04 - 0.02).toFixed(2));
         const nextVal = prev + fluctuation;
-        // Keep within realistic bounds of 4.2 GB - 5.8 GB
-        if (nextVal < 4.2) return 4.3;
-        if (nextVal > 5.8) return 5.7;
+        // Keep within realistic bounds of 0.95 GiB - 1.25 GiB
+        if (nextVal < 0.95) return 0.98;
+        if (nextVal > 1.25) return 1.22;
         return parseFloat(nextVal.toFixed(2));
       });
     }, 4000);
@@ -239,16 +239,16 @@ export default function ServerStats() {
                   <span className={`text-2xl sm:text-3xl font-display font-bold ${status?.online ? 'text-purple-400' : 'text-neutral-500'} tracking-tight`}>
                     {isLoadingStatus ? "-" : liveRam.toFixed(2)}
                   </span>
-                  <span className="text-xs font-mono text-neutral-500 font-medium">/ 12.0 GB</span>
+                  <span className="text-xs font-mono text-neutral-500 font-medium">/ 3.0 GiB</span>
                 </div>
               </div>
             </div>
             <div className="mt-4 flex items-center justify-between text-[11px] font-mono text-neutral-400">
               <span className="flex items-center gap-1">
                 <Activity className="w-3.5 h-3.5 text-purple-400" />
-                <span>Alokasi: Max 12 GB RAM</span>
+                <span>Alokasi: Max 3 GiB RAM</span>
               </span>
-              <span className="text-[10px] text-neutral-500">DDR5 ECC</span>
+              <span className="text-[10px] text-neutral-500">Standard RAM</span>
             </div>
           </motion.div>
 
