@@ -21,6 +21,7 @@ export default function ServerStats() {
   const [isLoadingStatus, setIsLoadingStatus] = useState<boolean>(true);
   const [liveTps, setLiveTps] = useState<number>(20.0);
   const [liveRam, setLiveRam] = useState<number>(0.0);
+  const [isFallbackActive, setIsFallbackActive] = useState<boolean>(false);
 
   // Fetch server status from backend API, with fallback directly to public APIs on client side (for Vercel/static deploys)
   const fetchServerStatus = async () => {
@@ -34,8 +35,10 @@ export default function ServerStats() {
         throw new Error('Invalid json from backend');
       }
       setStatus(data);
+      setIsFallbackActive(false);
     } catch (e) {
       console.warn('Backend API tidak tersedia atau gagal (kemungkinan dideploy di Vercel/Hosting Statis). Mencoba fetch client-side langsung...', e);
+      setIsFallbackActive(true);
       
       // Fallback 1: Fetch directly from public mcsrvstat API on the browser
       try {
@@ -351,6 +354,16 @@ export default function ServerStats() {
           </motion.div>
 
         </div>
+
+        {isFallbackActive && (
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-amber-500/5 border border-amber-500/15 rounded-xl p-3.5 text-center text-xs font-mono text-amber-400/80 max-w-2xl mx-auto"
+          >
+            ⚠️ <strong>Catatan Hosting Statis:</strong> Web mendeteksi deploy statis (misal Vercel) tanpa active backend. Status server diambil via API publik yang ter-cache selama 5-10 menit. Jika Anda baru mematikan/menyalakan server di panel, harap tunggu beberapa menit agar statusnya terupdate di web.
+          </motion.div>
+        )}
 
       </div>
     </section>
