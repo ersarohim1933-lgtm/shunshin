@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { WHATSAPP_GROUP_LINK, SERVER_INFO } from '../data';
-import { Copy, Check, Shield, Users, Compass, ChevronDown } from 'lucide-react';
+import { WHATSAPP_GROUP_LINK, DISCORD_LINK, SERVER_INFO } from '../data';
+import { Copy, Check, Shield, Users, Compass, ChevronDown, MessageSquare } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export default function Hero() {
@@ -103,14 +103,25 @@ export default function Hero() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
         >
+          {/* Main Join Discord */}
+          <a
+            href={DISCORD_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold px-7 py-4 rounded-xl text-base shadow-[0_0_30px_rgba(88,101,242,0.2)] hover:shadow-[0_0_35px_rgba(88,101,242,0.4)] transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+          >
+            <MessageSquare className="w-5 h-5 fill-current" />
+            Gabung Discord Resmi
+          </a>
+
           {/* Main Join Group WhatsApp */}
           <a
             href={WHATSAPP_GROUP_LINK}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold px-8 py-4 rounded-xl text-base shadow-[0_0_30px_rgba(245,158,11,0.25)] hover:shadow-[0_0_35px_rgba(245,158,11,0.45)] transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold px-7 py-4 rounded-xl text-base shadow-[0_0_30px_rgba(245,158,11,0.25)] hover:shadow-[0_0_35px_rgba(245,158,11,0.45)] transition-all duration-300 hover:-translate-y-1 cursor-pointer"
           >
-            Gabung Grup WhatsApp Resmi
+            Gabung Grup WhatsApp
           </a>
           
           {/* Secondary Scroll to Stepper */}
@@ -121,9 +132,9 @@ export default function Hero() {
                 element.scrollIntoView({ behavior: 'smooth' });
               }
             }}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-neutral-900/85 hover:bg-neutral-800 border border-neutral-700 text-neutral-200 hover:text-white font-medium px-8 py-4 rounded-xl text-base transition-all duration-300 hover:-translate-y-1 cursor-pointer backdrop-blur-sm"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-neutral-900/85 hover:bg-neutral-800 border border-neutral-700 text-neutral-200 hover:text-white font-medium px-7 py-4 rounded-xl text-base transition-all duration-300 hover:-translate-y-1 cursor-pointer backdrop-blur-sm"
           >
-            Lihat Panduan Bergabung
+            Lihat Panduan
           </button>
         </motion.div>
 

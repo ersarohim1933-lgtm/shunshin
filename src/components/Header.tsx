@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { WHATSAPP_GROUP_LINK } from '../data';
-import { Menu, X, ExternalLink, Flame } from 'lucide-react';
+import { WHATSAPP_GROUP_LINK, DISCORD_LINK } from '../data';
+import { Menu, X, ExternalLink, Flame, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function Header() {
@@ -106,16 +106,27 @@ export default function Header() {
           </nav>
 
           {/* Desktop CTA Action Buttons */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-3">
+            <a
+              href={DISCORD_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative inline-flex items-center gap-2 bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all duration-300 hover:-translate-y-0.5 cursor-pointer shadow-[0_0_15px_rgba(88,101,242,0.15)] hover:shadow-[0_0_20px_rgba(88,101,242,0.3)]"
+            >
+              <MessageSquare className="w-3.5 h-3.5 fill-current" />
+              Discord
+              <ExternalLink className="w-3 h-3 opacity-80" />
+            </a>
+            
             <a
               href={WHATSAPP_GROUP_LINK}
               target="_blank"
               rel="noopener noreferrer"
-              className="relative inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-neutral-950 font-bold text-sm px-5 py-2.5 rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:shadow-[0_0_25px_rgba(245,158,11,0.4)] transition-all duration-300 hover:-translate-y-0.5 cursor-pointer"
+              className="relative inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-neutral-950 font-bold text-xs px-4 py-2.5 rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:shadow-[0_0_25px_rgba(245,158,11,0.4)] transition-all duration-300 hover:-translate-y-0.5 cursor-pointer"
             >
-              <Flame className="w-4 h-4 fill-current animate-pulse" />
-              Gabung Grup WA
-              <ExternalLink className="w-3.5 h-3.5 opacity-80" />
+              <Flame className="w-3.5 h-3.5 fill-current animate-pulse" />
+              Grup WA
+              <ExternalLink className="w-3 h-3 opacity-80" />
             </a>
           </div>
 
@@ -174,12 +185,23 @@ export default function Header() {
                 <ExternalLink className="w-4 h-4" />
               </a>
               
-              <div className="pt-4 border-t border-neutral-900">
+              <div className="pt-4 border-t border-neutral-900 flex flex-col gap-3">
+                <a
+                  href={DISCORD_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3 px-4 rounded-xl shadow-lg w-full transition-colors cursor-pointer"
+                >
+                  <MessageSquare className="w-4 h-4 fill-current" />
+                  Gabung Server Discord
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+
                 <a
                   href={WHATSAPP_GROUP_LINK}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 text-neutral-950 font-bold py-3 px-4 rounded-xl shadow-lg w-full"
+                  className="flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 text-neutral-950 font-bold py-3 px-4 rounded-xl shadow-lg w-full cursor-pointer"
                 >
                   <Flame className="w-4 h-4 fill-current animate-pulse" />
                   Gabung Grup WA

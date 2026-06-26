@@ -1,6 +1,7 @@
 import { Feature, JoinStep, ServerRule, ServerInfo, GalleryItem } from './types';
 
 export const WHATSAPP_GROUP_LINK = "https://chat.whatsapp.com/D9cijRhTVNm3pBupyVp5Hk?s=cl&p=a&mlu=1&amv=3";
+export const DISCORD_LINK = "https://discord.gg/Ea8pPWKt4";
 
 export const SERVER_INFO: ServerInfo = {
   ip: "play.shunshine.qzz.io",

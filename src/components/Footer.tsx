@@ -1,4 +1,4 @@
-import { WHATSAPP_GROUP_LINK, SERVER_INFO } from '../data';
+import { WHATSAPP_GROUP_LINK, DISCORD_LINK, SERVER_INFO } from '../data';
 import { Flame, MessageSquare, ShieldCheck, Heart } from 'lucide-react';
 
 export default function Footer() {
@@ -53,12 +53,22 @@ export default function Footer() {
           </div>
 
           {/* Call to Action Button */}
-          <div className="md:col-span-3 flex justify-center sm:justify-end">
+          <div className="md:col-span-3 flex flex-col sm:flex-row md:flex-col gap-3 justify-center sm:justify-end items-stretch sm:items-center md:items-end">
+            <a
+              href={DISCORD_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 bg-neutral-900 hover:bg-neutral-850 text-[#7289da] hover:text-[#5865F2] border border-[#5865F2]/30 hover:border-[#5865F2]/50 text-xs font-bold py-3 px-5 rounded-xl transition-all duration-300 hover:shadow-[0_0_15px_rgba(88,101,242,0.1)] cursor-pointer"
+            >
+              <MessageSquare className="w-4 h-4 fill-current text-[#7289da]" />
+              Gabung Discord Resmi
+            </a>
+
             <a
               href={WHATSAPP_GROUP_LINK}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-neutral-900 hover:bg-neutral-850 text-amber-400 hover:text-amber-300 border border-amber-500/30 hover:border-amber-500/50 text-xs font-bold py-3 px-5 rounded-xl transition-all duration-300 hover:shadow-[0_0_15px_rgba(245,158,11,0.1)] cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 bg-neutral-900 hover:bg-neutral-850 text-amber-400 hover:text-amber-300 border border-amber-500/30 hover:border-amber-500/50 text-xs font-bold py-3 px-5 rounded-xl transition-all duration-300 hover:shadow-[0_0_15px_rgba(245,158,11,0.1)] cursor-pointer"
             >
               <MessageSquare className="w-4 h-4 fill-current text-green-400" />
               Gabung Grup WhatsApp
