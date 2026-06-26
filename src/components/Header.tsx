@@ -22,27 +22,27 @@ export default function Header() {
 
   const scrollToSection = (id: string) => {
     setIsOpen(false);
-    const element = document.getElementById(id);
-    if (element) {
-      const offset = 80; // height of fixed navbar
-      const bodyRect = document.body.getBoundingClientRect().top;
-      const elementRect = element.getBoundingClientRect().top;
-      const elementPosition = elementRect - bodyRect;
-      const offsetPosition = elementPosition - offset;
+    setTimeout(() => {
+      const element = document.getElementById(id);
+      if (element) {
+        const offset = 85; // height of fixed navbar
+        const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+        const offsetPosition = elementPosition - offset;
 
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-    }
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    }, 150);
   };
 
   return (
     <header
       id="main-header"
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? 'bg-neutral-950/85 backdrop-blur-md border-b border-neutral-800/60 py-3 shadow-lg'
+        isScrolled || isOpen
+          ? 'bg-neutral-950/95 backdrop-blur-md border-b border-neutral-800/60 py-3 shadow-lg'
           : 'bg-transparent py-5'
       }`}
     >
@@ -141,7 +141,7 @@ export default function Header() {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-lg text-neutral-400 hover:text-amber-400 hover:bg-neutral-900/60 transition-colors"
+              className="p-2 rounded-lg text-neutral-400 hover:text-amber-400 hover:bg-neutral-900/60 transition-colors cursor-pointer relative z-50"
               aria-label="Toggle menu"
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -159,7 +159,7 @@ export default function Header() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25 }}
-            className="md:hidden bg-neutral-950 border-b border-neutral-800"
+            className="md:hidden bg-neutral-950 border-b border-neutral-800 overflow-hidden"
           >
             <div className="px-4 pt-3 pb-6 space-y-4">
               <button
