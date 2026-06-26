@@ -142,17 +142,17 @@ export default function ServerStats() {
       return;
     }
 
-    // Set initial realistic value around 1.04 GiB (as shown in panel screenshot)
-    setLiveRam(parseFloat((1.01 + Math.random() * 0.06).toFixed(2)));
+    // Set initial realistic value around 2.45 GiB (more realistic for 6GB RAM)
+    setLiveRam(parseFloat((2.10 + Math.random() * 0.40).toFixed(2)));
 
     const ramInterval = setInterval(() => {
-      // Simulate highly realistic micro RAM fluctuations (+/- 0.02 GiB)
+      // Simulate highly realistic micro RAM fluctuations (+/- 0.05 GiB)
       setLiveRam(prev => {
-        const fluctuation = parseFloat((Math.random() * 0.04 - 0.02).toFixed(2));
+        const fluctuation = parseFloat((Math.random() * 0.10 - 0.05).toFixed(2));
         const nextVal = prev + fluctuation;
-        // Keep within realistic bounds of 0.95 GiB - 1.25 GiB
-        if (nextVal < 0.95) return 0.98;
-        if (nextVal > 1.25) return 1.22;
+        // Keep within realistic bounds of 2.00 GiB - 4.50 GiB
+        if (nextVal < 2.00) return 2.15;
+        if (nextVal > 4.50) return 4.35;
         return parseFloat(nextVal.toFixed(2));
       });
     }, 4000);
@@ -283,7 +283,7 @@ export default function ServerStats() {
                 <Activity className="w-3.5 h-3.5 text-emerald-400" />
                 <span>{status?.ptero ? `Status: ${status.ptero.state.toUpperCase()}` : `Status: ${status?.online ? "Sangat Stabil" : "Offline"}`}</span>
               </span>
-              <span className="text-[10px] text-neutral-500">{status?.ptero ? `Disk: ${status.ptero.disk.toFixed(1)}/${status.ptero.diskMax} GB` : "Survival"}</span>
+              <span className="text-[10px] text-neutral-500">{status?.ptero ? `Disk: ${status.ptero.disk.toFixed(1)}/${status.ptero.diskMax} GB` : "Disk: 4.8/18.0 GB"}</span>
             </div>
           </motion.div>
 
@@ -303,14 +303,14 @@ export default function ServerStats() {
                   <span className={`text-2xl sm:text-3xl font-display font-bold ${status?.online ? 'text-purple-400' : 'text-neutral-500'} tracking-tight`}>
                     {isLoadingStatus ? "-" : liveRam.toFixed(2)}
                   </span>
-                  <span className="text-xs font-mono text-neutral-500 font-medium">/ {status?.ptero ? `${status.ptero.ramMax} GiB` : "3.0 GiB"}</span>
+                  <span className="text-xs font-mono text-neutral-500 font-medium">/ {status?.ptero ? `${status.ptero.ramMax} GiB` : "6.0 GiB"}</span>
                 </div>
               </div>
             </div>
             <div className="mt-4 flex items-center justify-between text-[11px] font-mono text-neutral-400">
               <span className="flex items-center gap-1">
                 <Activity className="w-3.5 h-3.5 text-purple-400" />
-                <span>Alokasi: Max {status?.ptero ? `${status.ptero.ramMax} GiB` : "3 GiB"} RAM</span>
+                <span>Alokasi: Max {status?.ptero ? `${status.ptero.ramMax} GiB` : "6 GiB"} RAM</span>
               </span>
               <span className="text-[10px] text-neutral-500">{status?.ptero ? "Realtime Panel" : "Standard RAM"}</span>
             </div>

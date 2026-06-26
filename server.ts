@@ -159,12 +159,12 @@ async function getPterodactylStats(): Promise<PterodactylData | null> {
     const cpu = resources.attributes?.resources?.cpu_absolute ?? 0;
     
     // Pterodactyl memory limit is in MB, memory usage is in bytes.
-    const ramMaxMB = details.attributes?.limits?.memory ?? 3072;
+    const ramMaxMB = details.attributes?.limits?.memory ?? 6144;
     const ramMaxGiB = parseFloat((ramMaxMB / 1024).toFixed(2));
     const ramBytes = resources.attributes?.resources?.memory_bytes ?? 0;
     const ramGiB = parseFloat((ramBytes / (1024 * 1024 * 1024)).toFixed(2));
 
-    const diskMaxMB = details.attributes?.limits?.disk ?? 10240;
+    const diskMaxMB = details.attributes?.limits?.disk ?? 18432;
     const diskMaxGB = parseFloat((diskMaxMB / 1024).toFixed(2));
     const diskBytes = resources.attributes?.resources?.disk_bytes ?? 0;
     const diskGB = parseFloat((diskBytes / (1024 * 1024 * 1024)).toFixed(2));
