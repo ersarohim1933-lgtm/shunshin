@@ -106,6 +106,84 @@ function pingBedrockUdp(host: string, port: number, timeout = 1500): Promise<boo
   });
 }
 
+interface PterodactylData {
+  online: boolean;
+  cpu: number;
+  ram: number;
+  ramMax: number;
+  disk: number;
+  diskMax: number;
+  state: string;
+}
+
+// Fetch real-time resources and limits from Pterodactyl Client API
+async function getPterodactylStats(): Promise<PterodactylData | null> {
+  const apiKey = process.env.PTERODACTYL_API_KEY;
+  const panelUrlRaw = process.env.PTERODACTYL_PANEL_URL;
+  const serverId = process.env.PTERODACTYL_SERVER_ID;
+
+  if (!apiKey || !panelUrlRaw || !serverId) {
+    return null;
+  }
+
+  const panelUrl = panelUrlRaw.replace(/\/$/, "");
+
+  try {
+    const [detailsRes, resourcesRes] = await Promise.all([
+      fetch(`${panelUrl}/api/client/servers/${serverId}`, {
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Accept": "application/json"
+        },
+        signal: AbortSignal.timeout(3500)
+      }),
+      fetch(`${panelUrl}/api/client/servers/${serverId}/resources`, {
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Accept": "application/json"
+        },
+        signal: AbortSignal.timeout(3500)
+      })
+    ]);
+
+    if (!detailsRes.ok || !resourcesRes.ok) {
+      throw new Error(`Pterodactyl fetch failed: details=${detailsRes.status}, resources=${resourcesRes.status}`);
+    }
+
+    const details = await detailsRes.json() as any;
+    const resources = await resourcesRes.json() as any;
+
+    const current_state = resources.attributes?.current_state || "offline";
+    const isOnline = current_state === "running" || current_state === "starting";
+
+    const cpu = resources.attributes?.resources?.cpu_absolute ?? 0;
+    
+    // Pterodactyl memory limit is in MB, memory usage is in bytes.
+    const ramMaxMB = details.attributes?.limits?.memory ?? 3072;
+    const ramMaxGiB = parseFloat((ramMaxMB / 1024).toFixed(2));
+    const ramBytes = resources.attributes?.resources?.memory_bytes ?? 0;
+    const ramGiB = parseFloat((ramBytes / (1024 * 1024 * 1024)).toFixed(2));
+
+    const diskMaxMB = details.attributes?.limits?.disk ?? 10240;
+    const diskMaxGB = parseFloat((diskMaxMB / 1024).toFixed(2));
+    const diskBytes = resources.attributes?.resources?.disk_bytes ?? 0;
+    const diskGB = parseFloat((diskBytes / (1024 * 1024 * 1024)).toFixed(2));
+
+    return {
+      online: isOnline,
+      cpu: parseFloat(cpu.toFixed(2)),
+      ram: ramGiB,
+      ramMax: ramMaxGiB,
+      disk: diskGB,
+      diskMax: diskMaxGB,
+      state: current_state
+    };
+  } catch (error: any) {
+    console.error("Error fetching Pterodactyl details or resources:", error.message || error);
+    return null;
+  }
+}
+
 // In production, we'll serve the static files in /dist
 // In development, we'll use Vite dev server as middleware
 
@@ -120,29 +198,42 @@ async function startServer() {
 
   // API Route: Get Server Status
   app.get("/api/server-status", async (req, res) => {
+    // 1. Try to fetch real-time resources and status from Pterodactyl if credentials are set
+    const pteroData = await getPterodactylStats();
+
     // Determine which host is currently online
     let activeHost = PREFERRED_HOST;
-    let [tcpOnline, udpOnline] = await Promise.all([
-      pingMinecraftPort(PREFERRED_HOST, 19136, 1200),
-      pingBedrockUdp(PREFERRED_HOST, 19136, 1200)
-    ]);
+    let tcpOnline = false;
+    let udpOnline = false;
 
-    // If preferred host fails, try fallback host immediately
-    if (!tcpOnline && !udpOnline) {
-      const [fbTcp, fbUdp] = await Promise.all([
-        pingMinecraftPort(FALLBACK_HOST, 19136, 1200),
-        pingBedrockUdp(FALLBACK_HOST, 19136, 1200)
+    if (pteroData) {
+      // If Pterodactyl returned valid stats, use its online state directly!
+      tcpOnline = pteroData.online;
+      udpOnline = pteroData.online;
+    } else {
+      // Otherwise, check status via direct TCP/UDP ping
+      [tcpOnline, udpOnline] = await Promise.all([
+        pingMinecraftPort(PREFERRED_HOST, 19136, 1200),
+        pingBedrockUdp(PREFERRED_HOST, 19136, 1200)
       ]);
-      if (fbTcp || fbUdp) {
-        activeHost = FALLBACK_HOST;
-        tcpOnline = fbTcp;
-        udpOnline = fbUdp;
+
+      // If preferred host fails, try fallback host immediately
+      if (!tcpOnline && !udpOnline) {
+        const [fbTcp, fbUdp] = await Promise.all([
+          pingMinecraftPort(FALLBACK_HOST, 19136, 1200),
+          pingBedrockUdp(FALLBACK_HOST, 19136, 1200)
+        ]);
+        if (fbTcp || fbUdp) {
+          activeHost = FALLBACK_HOST;
+          tcpOnline = fbTcp;
+          udpOnline = fbUdp;
+        }
       }
     }
 
-    const isCurrentlyOnline = tcpOnline || udpOnline;
+    const isCurrentlyOnline = pteroData ? pteroData.online : (tcpOnline || udpOnline);
 
-    // If direct checks show the server is offline, trust them 100% and bypass cache immediately!
+    // If direct checks / Pterodactyl show the server is offline, trust them 100% and bypass cache immediately!
     if (!isCurrentlyOnline) {
       return res.json({
         online: false,
@@ -150,7 +241,8 @@ async function startServer() {
         maxPlayers: 50, // Default configured max players
         onlinePlayers: [],
         host: PREFERRED_HOST,
-        realtime: true
+        realtime: true,
+        ptero: pteroData
       });
     }
 
@@ -163,12 +255,13 @@ async function startServer() {
       const data = await response.json();
       
       res.json({
-        online: true, // We verified it's online via direct ping, even if API is slow to update
+        online: true, // We verified it's online via direct ping or Pterodactyl
         currentPlayers: data.players?.online ?? 0,
         maxPlayers: data.players?.max ?? 50, // Default to 50 as set by user
         onlinePlayers: data.players?.list?.map((p: any) => typeof p === 'string' ? p : p.name) ?? [],
         host: PREFERRED_HOST,
-        realtime: true
+        realtime: true,
+        ptero: pteroData
       });
     } catch (error: any) {
       console.error("Gagal mendapatkan status lengkap dari mcsrvstat:", error.message || error);
@@ -185,7 +278,8 @@ async function startServer() {
               maxPlayers: altData.players?.max ?? 50,
               onlinePlayers: [],
               host: PREFERRED_HOST,
-              realtime: true
+              realtime: true,
+              ptero: pteroData
             });
             return;
           }
@@ -202,6 +296,7 @@ async function startServer() {
         onlinePlayers: [],
         host: PREFERRED_HOST,
         realtime: true,
+        ptero: pteroData,
         warning: "API statistik penuh sedang bermasalah, namun koneksi server aktif."
       });
     }

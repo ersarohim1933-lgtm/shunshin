@@ -3,11 +3,22 @@ import { SERVER_INFO } from '../data';
 import { Server, Cpu, Wifi, Activity, Sparkles, Users, HardDrive } from 'lucide-react';
 import { motion } from 'motion/react';
 
+interface PteroStats {
+  online: boolean;
+  cpu: number;
+  ram: number;
+  ramMax: number;
+  disk: number;
+  diskMax: number;
+  state: string;
+}
+
 interface ServerStatus {
   online: boolean;
   currentPlayers: number;
   maxPlayers: number;
   onlinePlayers: string[];
+  ptero?: PteroStats | null;
   error?: string;
 }
 
@@ -117,12 +128,17 @@ export default function ServerStats() {
     return () => clearInterval(tpsInterval);
   }, [status?.online, isLoadingStatus]);
 
-  // Fluctuating real-time RAM simulation
+  // Fluctuating real-time RAM simulation / Pterodactyl integration
   useEffect(() => {
     if (isLoadingStatus) return;
     
     if (!status?.online) {
       setLiveRam(0.0);
+      return;
+    }
+
+    if (status?.ptero) {
+      setLiveRam(status.ptero.ram);
       return;
     }
 
@@ -142,7 +158,7 @@ export default function ServerStats() {
     }, 4000);
 
     return () => clearInterval(ramInterval);
-  }, [status?.online, isLoadingStatus]);
+  }, [status?.online, status?.ptero, isLoadingStatus]);
 
   // Ping test trigger simulator
   const handlePingTest = (region: string) => {
@@ -229,13 +245,13 @@ export default function ServerStats() {
                     {isLoadingStatus ? "-" : status?.currentPlayers ?? 0}
                   </span>
                   <span className="text-sm text-neutral-500">
-                    / {isLoadingStatus ? "-" : status?.maxPlayers ?? 20} Warga
+                    / {isLoadingStatus ? "-" : status?.maxPlayers ?? SERVER_INFO.maxPlayers} Warga
                   </span>
                 </div>
               </div>
             </div>
             <div className="mt-4 flex items-center justify-between text-xs text-neutral-400 font-mono">
-              <span>Maksimal Kapasitas: {status?.maxPlayers ?? 20}</span>
+              <span>Maksimal Kapasitas: {status?.maxPlayers ?? SERVER_INFO.maxPlayers}</span>
               {status?.onlinePlayers && status.onlinePlayers.length > 0 && (
                 <span className="text-amber-400 text-[10px] animate-pulse">Warga aktif bermain!</span>
               )}
@@ -253,21 +269,21 @@ export default function ServerStats() {
                 <Cpu className="w-6 h-6 animate-pulse" />
               </div>
               <div>
-                <span className="text-xs font-mono tracking-widest text-neutral-400 uppercase">TPS Server Realtime</span>
+                <span className="text-xs font-mono tracking-widest text-neutral-400 uppercase">{status?.ptero ? "Beban CPU Panel" : "TPS Server Realtime"}</span>
                 <div className="flex items-baseline gap-1 mt-0.5">
                   <span className={`text-2xl sm:text-3xl font-display font-bold ${status?.online ? 'text-emerald-400' : 'text-neutral-500'} tracking-tight`}>
-                    {isLoadingStatus ? "-" : liveTps.toFixed(2)}
+                    {isLoadingStatus ? "-" : status?.ptero ? `${status.ptero.cpu.toFixed(1)}%` : liveTps.toFixed(2)}
                   </span>
-                  <span className="text-xs font-mono text-neutral-500 font-medium">/ 20.0</span>
+                  <span className="text-xs font-mono text-neutral-500 font-medium">{status?.ptero ? "" : "/ 20.0"}</span>
                 </div>
               </div>
             </div>
             <div className="mt-4 flex items-center justify-between text-[11px] font-mono text-neutral-400">
               <span className="flex items-center gap-1">
                 <Activity className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Status: {status?.online ? "Sangat Stabil" : "Offline"}</span>
+                <span>{status?.ptero ? `Status: ${status.ptero.state.toUpperCase()}` : `Status: ${status?.online ? "Sangat Stabil" : "Offline"}`}</span>
               </span>
-              <span className="text-[10px] text-neutral-500">Survival</span>
+              <span className="text-[10px] text-neutral-500">{status?.ptero ? `Disk: ${status.ptero.disk.toFixed(1)}/${status.ptero.diskMax} GB` : "Survival"}</span>
             </div>
           </motion.div>
 
@@ -287,16 +303,16 @@ export default function ServerStats() {
                   <span className={`text-2xl sm:text-3xl font-display font-bold ${status?.online ? 'text-purple-400' : 'text-neutral-500'} tracking-tight`}>
                     {isLoadingStatus ? "-" : liveRam.toFixed(2)}
                   </span>
-                  <span className="text-xs font-mono text-neutral-500 font-medium">/ 3.0 GiB</span>
+                  <span className="text-xs font-mono text-neutral-500 font-medium">/ {status?.ptero ? `${status.ptero.ramMax} GiB` : "3.0 GiB"}</span>
                 </div>
               </div>
             </div>
             <div className="mt-4 flex items-center justify-between text-[11px] font-mono text-neutral-400">
               <span className="flex items-center gap-1">
                 <Activity className="w-3.5 h-3.5 text-purple-400" />
-                <span>Alokasi: Max 3 GiB RAM</span>
+                <span>Alokasi: Max {status?.ptero ? `${status.ptero.ramMax} GiB` : "3 GiB"} RAM</span>
               </span>
-              <span className="text-[10px] text-neutral-500">Standard RAM</span>
+              <span className="text-[10px] text-neutral-500">{status?.ptero ? "Realtime Panel" : "Standard RAM"}</span>
             </div>
           </motion.div>
 
