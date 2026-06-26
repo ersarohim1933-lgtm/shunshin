@@ -94,6 +94,13 @@ export default function Header() {
               Aturan Server
             </button>
 
+            <button 
+              onClick={() => scrollToSection('gallery')} 
+              className="text-sm font-medium text-neutral-300 hover:text-amber-400 transition-colors cursor-pointer"
+            >
+              Galeri Komunitas
+            </button>
+
             <a 
               href="https://minecraft-mp.com/server/359813/vote/"
               target="_blank"
@@ -173,6 +180,13 @@ export default function Header() {
                 className="block w-full text-left py-2.5 px-3 rounded-lg text-base font-medium text-neutral-300 hover:bg-neutral-900 hover:text-amber-400 transition-all cursor-pointer"
               >
                 Aturan Server
+              </button>
+
+              <button
+                onClick={() => scrollToSection('gallery')}
+                className="block w-full text-left py-2.5 px-3 rounded-lg text-base font-medium text-neutral-300 hover:bg-neutral-900 hover:text-amber-400 transition-all cursor-pointer"
+              >
+                Galeri Komunitas
               </button>
 
               <a

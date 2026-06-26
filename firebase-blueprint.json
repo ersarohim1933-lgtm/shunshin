@@ -1,0 +1,13 @@
+{
+  "collections": {
+    "gallery": {
+      "fields": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "playerName": { "type": "string" },
+        "createdAt": { "type": "timestamp" }
+      }
+    }
+  }
+}

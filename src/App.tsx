@@ -4,6 +4,7 @@ import ServerStats from './components/ServerStats';
 import Features from './components/Features';
 import HowToJoin from './components/HowToJoin';
 import Rules from './components/Rules';
+import Gallery from './components/Gallery';
 import Footer from './components/Footer';
 
 export default function App() {
@@ -30,6 +31,9 @@ export default function App() {
         
         {/* Collapsible Accordion Rules & Guidelines */}
         <Rules />
+        
+        {/* Interactive Community Screenshot Gallery (Firebase Integrated) */}
+        <Gallery />
         
       </main>
 
