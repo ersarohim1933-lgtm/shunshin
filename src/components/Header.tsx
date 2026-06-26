@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { WHATSAPP_GROUP_LINK, DISCORD_LINK } from '../data';
-import { Menu, X, ExternalLink, Flame, MessageSquare } from 'lucide-react';
+import { Menu, X, ExternalLink, Flame, MessageSquare, Image } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function Header() {
@@ -138,7 +138,15 @@ export default function Header() {
           </div>
 
           {/* Mobile Menu Toggle Button */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center gap-2">
+            <button
+              onClick={() => scrollToSection('gallery')}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 font-bold text-xs cursor-pointer transition-all hover:bg-amber-500/20"
+            >
+              <Image className="w-3.5 h-3.5" />
+              <span>Galeri</span>
+            </button>
+
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="p-2 rounded-lg text-neutral-400 hover:text-amber-400 hover:bg-neutral-900/60 transition-colors cursor-pointer relative z-50"
