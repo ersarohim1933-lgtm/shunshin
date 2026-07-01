@@ -201,105 +201,111 @@ async function startServer() {
     // 1. Try to fetch real-time resources and status from Pterodactyl if credentials are set
     const pteroData = await getPterodactylStats();
 
-    // Determine which host is currently online
-    let activeHost = PREFERRED_HOST;
-    let tcpOnline = false;
-    let udpOnline = false;
+    let online = pteroData ? pteroData.online : false;
+    let currentPlayers = 0;
+    let maxPlayers = 200;
+    let onlinePlayers: any[] = [];
+    let foundViaPublicApi = false;
 
-    if (pteroData) {
-      // If Pterodactyl returned valid stats, use its online state directly!
-      tcpOnline = pteroData.online;
-      udpOnline = pteroData.online;
-    } else {
-      // Otherwise, check status via direct TCP/UDP ping
-      [tcpOnline, udpOnline] = await Promise.all([
-        pingMinecraftPort(PREFERRED_HOST, 19136, 1200),
-        pingBedrockUdp(PREFERRED_HOST, 19136, 1200)
-      ]);
-
-      // If preferred host fails, try fallback host immediately
-      if (!tcpOnline && !udpOnline) {
-        const [fbTcp, fbUdp] = await Promise.all([
-          pingMinecraftPort(FALLBACK_HOST, 19136, 1200),
-          pingBedrockUdp(FALLBACK_HOST, 19136, 1200)
-        ]);
-        if (fbTcp || fbUdp) {
-          activeHost = FALLBACK_HOST;
-          tcpOnline = fbTcp;
-          udpOnline = fbUdp;
-        }
+    // 2. Query public Bedrock & Java Status APIs (mcsrvstat.us and mcstatus.io are extremely reliable)
+    // We try multiple endpoints in PARALLEL with a safe timeout to ensure speed and accuracy.
+    const apiEndpoints = [
+      {
+        name: "mcsrvstat_bedrock",
+        url: `https://api.mcsrvstat.us/bedrock/3/${PREFERRED_HOST}:19136`,
+        parse: (data: any) => ({
+          online: data.online === true,
+          currentPlayers: data.players?.online ?? 0,
+          maxPlayers: data.players?.max ?? 200,
+          onlinePlayers: data.players?.list?.map((p: any) => typeof p === "string" ? p : p.name) ?? []
+        })
+      },
+      {
+        name: "mcstatus_bedrock",
+        url: `https://api.mcstatus.io/v2/status/bedrock/${PREFERRED_HOST}:19136`,
+        parse: (data: any) => ({
+          online: data.online === true,
+          currentPlayers: data.players?.online ?? 0,
+          maxPlayers: data.players?.max ?? 200,
+          onlinePlayers: data.players?.list?.map((p: any) => typeof p === "string" ? p : p.name) ?? []
+        })
+      },
+      {
+        name: "mcsrvstat_java",
+        url: `https://api.mcsrvstat.us/3/${PREFERRED_HOST}:19136`,
+        parse: (data: any) => ({
+          online: data.online === true,
+          currentPlayers: data.players?.online ?? 0,
+          maxPlayers: data.players?.max ?? 200,
+          onlinePlayers: data.players?.list?.map((p: any) => typeof p === "string" ? p : p.name) ?? []
+        })
+      },
+      {
+        name: "mcstatus_java",
+        url: `https://api.mcstatus.io/v2/status/java/${PREFERRED_HOST}:19136`,
+        parse: (data: any) => ({
+          online: data.online === true,
+          currentPlayers: data.players?.online ?? 0,
+          maxPlayers: data.players?.max ?? 200,
+          onlinePlayers: data.players?.list?.map((p: any) => typeof p === "string" ? p : p.name) ?? []
+        })
       }
-    }
+    ];
 
-    const isCurrentlyOnline = pteroData ? pteroData.online : (tcpOnline || udpOnline);
-
-    // If direct checks / Pterodactyl show the server is offline, trust them 100% and bypass cache immediately!
-    if (!isCurrentlyOnline) {
-      return res.json({
-        online: false,
-        currentPlayers: 0,
-        maxPlayers: 50, // Default configured max players
-        onlinePlayers: [],
-        host: PREFERRED_HOST,
-        realtime: true,
-        ptero: pteroData
-      });
-    }
-
-    try {
-      // Fetch status from Minecraft server status API to get player counts, list of players, and max capacity
-      const response = await fetch(`https://api.mcsrvstat.us/3/${activeHost}`);
-      if (!response.ok) {
-        throw new Error(`Public API returned status ${response.status}`);
-      }
-      const data = await response.json();
-      
-      res.json({
-        online: true, // We verified it's online via direct ping or Pterodactyl
-        currentPlayers: data.players?.online ?? 0,
-        maxPlayers: data.players?.max ?? 50, // Default to 50 as set by user
-        onlinePlayers: data.players?.list?.map((p: any) => typeof p === 'string' ? p : p.name) ?? [],
-        host: PREFERRED_HOST,
-        realtime: true,
-        ptero: pteroData
-      });
-    } catch (error: any) {
-      console.error("Gagal mendapatkan status lengkap dari mcsrvstat:", error.message || error);
-      
-      // Fallback to minetools if mcsrvstat is down or rate-limited
+    const fetchPromises = apiEndpoints.map(async (endpoint) => {
       try {
-        const altResponse = await fetch(`https://api.minetools.eu/ping/${activeHost}/19136`);
-        if (altResponse.ok) {
-          const altData = await altResponse.json();
-          if (!altData.error) {
-            res.json({
-              online: true,
-              currentPlayers: altData.players?.online ?? 0,
-              maxPlayers: altData.players?.max ?? 50,
-              onlinePlayers: [],
-              host: PREFERRED_HOST,
-              realtime: true,
-              ptero: pteroData
-            });
-            return;
+        const response = await fetch(endpoint.url, {
+          signal: AbortSignal.timeout(3000)
+        });
+        if (response.ok) {
+          const data = await response.json();
+          const parsed = endpoint.parse(data);
+          if (parsed.online) {
+            return parsed;
           }
         }
-      } catch (altError) {
-        // Ignore alt error
+      } catch (err: any) {
+        // Quietly log to avoid console cluttering or error flags
+        console.log(`[Status API] ${endpoint.name} query fallback or timeout`);
       }
+      return null;
+    });
 
-      // If both public APIs failed but our direct ping was successful, report as online with generic stats
-      res.json({
-        online: true,
-        currentPlayers: 0,
-        maxPlayers: 50,
-        onlinePlayers: [],
-        host: PREFERRED_HOST,
-        realtime: true,
-        ptero: pteroData,
-        warning: "API statistik penuh sedang bermasalah, namun koneksi server aktif."
-      });
+    const results = await Promise.all(fetchPromises);
+    const activeResult = results.find(r => r !== null && r.online);
+
+    if (activeResult) {
+      online = true;
+      currentPlayers = activeResult.currentPlayers;
+      maxPlayers = activeResult.maxPlayers;
+      onlinePlayers = activeResult.onlinePlayers;
+      foundViaPublicApi = true;
     }
+
+    // 3. Fallback direct socket pings if not found via public APIs and no Pterodactyl stats
+    if (!foundViaPublicApi && !pteroData) {
+      const [tcpOnline, udpOnline] = await Promise.all([
+        pingMinecraftPort(PREFERRED_HOST, 19136, 1000),
+        pingBedrockUdp(PREFERRED_HOST, 19136, 1000)
+      ]).catch(() => [false, false]);
+
+      if (tcpOnline || udpOnline) {
+        online = true;
+        currentPlayers = 0;
+        maxPlayers = 200;
+        onlinePlayers = [];
+      }
+    }
+
+    return res.json({
+      online,
+      currentPlayers,
+      maxPlayers,
+      onlinePlayers,
+      host: PREFERRED_HOST,
+      realtime: true,
+      ptero: pteroData
+    });
   });
 
   // Vite middleware for development
